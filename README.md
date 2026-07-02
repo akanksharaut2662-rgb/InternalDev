@@ -1,4 +1,4 @@
-# Internal Developer Platform (IDP)
+# PolicyCraft - Internal Developer Platform
 
 A web-based Internal Developer Platform that lets organizations define company-wide engineering standards in plain language, then automatically generates standardized, compliance-validated microservice code for developers to download as a ZIP.
 
