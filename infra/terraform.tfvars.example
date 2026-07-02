@@ -1,0 +1,4 @@
+# Copy this file to terraform.tfvars and fill in your values
+# terraform.tfvars is gitignored — never commit your real API key
+
+groq_api_key = "gsk_your_groq_api_key_here"
