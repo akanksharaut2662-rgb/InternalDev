@@ -45,9 +45,8 @@ A web-based Internal Developer Platform that lets organizations define company-w
 
 ## AWS Academy Learner Lab Constraints
 
-- **IAM**: All Lambdas use the pre-existing `LabRole` — no custom IAM roles can be created. In production, each Lambda would have a least-privilege role scoped to its specific resource needs.
-- **Secrets Manager**: Not accessible — Groq API key stored in Lambda environment variables.
-- **Bedrock**: Model access provisioning restricted — Groq API used as external alternative. AWS 3+ service category requirement still met via Lambda/SQS/API Gateway/CloudWatch/DynamoDB/S3.
+- **IAM**: All Lambdas use the pre-existing `LabRole` as no custom IAM roles can be created. In production, each Lambda would have a least-privilege role scoped to its specific resource needs.
+- **Bedrock**: Model access provisioning restricted: Groq API used as external alternative. AWS 3+ service category requirement still met via Lambda/SQS/API Gateway/CloudWatch/DynamoDB/S3.
 
 ## Prerequisites
 
@@ -85,7 +84,7 @@ cd infra
 terraform destroy
 ```
 
-All resources use randomized suffixes — no collisions on re-deploy.
+All resources use randomized suffixes, no collisions on re-deploy.
 
 ## License
 
