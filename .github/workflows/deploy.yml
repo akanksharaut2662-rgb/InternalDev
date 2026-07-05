@@ -1,0 +1,76 @@
+name: Deploy
+
+# Triggers only on direct push to main (i.e. after a PR is merged)
+on:
+  push:
+    branches: [main]
+
+jobs:
+  # ── Re-run tests before deploying ────────────────────────────────────────────
+  backend-tests:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: backend/requirements-dev.txt
+      - run: pip install -r backend/requirements-dev.txt
+      - run: pytest backend/tests/ -v --tb=short
+
+  frontend-tests:
+    name: Frontend Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - working-directory: frontend
+        run: npm ci
+      - working-directory: frontend
+        run: npm test
+
+  # ── Deploy frontend to S3 ─────────────────────────────────────────────────────
+  deploy-frontend:
+    name: Deploy Frontend
+    needs: [backend-tests, frontend-tests]
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Upload to S3
+        run: aws s3 sync frontend/dist/ s3://${{ secrets.FRONTEND_BUCKET }} --delete
+
+      - name: Print live URL
+        run: echo "Deployed → http://${{ secrets.FRONTEND_BUCKET }}.s3-website-us-east-1.amazonaws.com"

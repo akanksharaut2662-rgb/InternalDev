@@ -5,6 +5,7 @@ import {
   AlertCircle, Briefcase,
 } from 'lucide-react';
 import { listRequests } from '../services/api';
+import { fmt, deriveType } from '../utils/format';
 
 /* ─── Circular compliance ring ───────────────────────────────────────────── */
 function ComplianceRing({ passed, total }) {
@@ -77,19 +78,6 @@ function RowActions({ request, onNavigate }) {
 
 const MI = { display: 'block', width: '100%', textAlign: 'left', padding: '9px 14px', fontSize: 13, fontWeight: 500, background: 'none', border: 'none', cursor: 'pointer', color: '#374151' };
 
-/* ─── Helpers ────────────────────────────────────────────────────────────── */
-function fmt(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-}
-
-function deriveType(req = '') {
-  const l = req.toLowerCase();
-  if (l.includes('event') || l.includes('queue') || l.includes('message') || l.includes('notification')) return 'Event Driven';
-  if (l.includes('batch') || l.includes('job') || l.includes('cron')) return 'Batch';
-  if (l.includes('crud') || l.includes('database') || l.includes('storage')) return 'CRUD';
-  return 'REST API';
-}
 
 /* ─── Main ───────────────────────────────────────────────────────────────── */
 export default function DeveloperPortal({ adminView = false }) {
