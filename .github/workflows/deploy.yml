@@ -5,11 +5,6 @@ on:
   push:
     branches: [main]
 
-# ── Fill these two values in once after your first terraform apply ────────────
-env:
-  VITE_API_URL: https://REPLACE_WITH_YOUR_API_GATEWAY_URL
-  FRONTEND_BUCKET: REPLACE_WITH_YOUR_BUCKET_NAME
-
 jobs:
   # ── Re-run tests before deploying ────────────────────────────────────────────
   backend-tests:
@@ -63,7 +58,7 @@ jobs:
         working-directory: frontend
         run: npm run build
         env:
-          VITE_API_URL: ${{ env.VITE_API_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
@@ -74,7 +69,7 @@ jobs:
           aws-region: us-east-1
 
       - name: Upload to S3
-        run: aws s3 sync frontend/dist/ s3://${{ env.FRONTEND_BUCKET }} --delete
+        run: aws s3 sync frontend/dist/ s3://${{ secrets.FRONTEND_BUCKET }} --delete
 
       - name: Print live URL
-        run: echo "Deployed to http://${{ env.FRONTEND_BUCKET }}.s3-website-us-east-1.amazonaws.com"
+        run: echo "Deployed to http://${{ secrets.FRONTEND_BUCKET }}.s3-website-us-east-1.amazonaws.com"
